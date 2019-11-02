@@ -2,7 +2,7 @@
 
 A simple Python command line domain name generator which I wrote after finding quite a lot of the web-based tools lacking for my purposes, which was:
 
- * generate a simple two word domain.
+ * generate a simple 2+ word domain.
  * only look at .com.
  * don't report registered (or 'premium') domains.
 
@@ -24,10 +24,10 @@ keywordsawesome.com is available
 
 ```
 
-This tool creates all possible non-repeating combinations from the provided keywords. As per the TODOs below, I will make this tool a bit more flexible shortly.
+This tool creates all possible combinations from the provided keywords. As per the TODOs below, I will make this tool a bit more flexible shortly.
 
 ## TODOs
 
- * Allow for keyword variations (probably by allowing something like `python generatedomain.py tech,techno,techy kw2 kw3` - better than trying to be smart by adding "no", "ie", "y" onto the end of keywords and usually getting it wrong).
+ * Allow for keyword variations (probably by allowing something like `python generatedomain.py --kws tech,techno,techy kw2 kw3` - better than trying to be smart by adding "no", "ie", "y" onto the end of keywords and usually getting it wrong).
  * An option to skip the WHOIS check.
  * An option to also output taken domains (along with their expiry date).

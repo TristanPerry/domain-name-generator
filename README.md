@@ -2,32 +2,44 @@
 
 A simple Python command line domain name generator which I wrote after finding quite a lot of the web-based tools lacking for my purposes, which was:
 
- * generate a simple 2+ word domain.
+ * generate a simple 2+ word domain (based on keyword 'groups' - e.g. "smart,smarter,clever,intelligent" is a single group)
  * only look at .com.
  * don't report registered (or 'premium') domains.
 
-This tool generates keywords based on the provided arguments and then checks if they are registered or not (and currently only outputs available ones).
+This tool generates keywords based on the provided arguments and then checks if they are registered or not (and by default only outputs available ones).
  
 Usage is command line:
 
 ```
 $ python generatedomain.py
-usage: generatedomain.py [-h] [--allow-duplicates]
-                         [--number-words NUMBER_WORDS] --kws KWS [KWS ...]
-generatedomain.py: error: the following arguments are required: --kws
+usage: generatedomain.py [-h] [--skip-whois] [--show-taken] --kws KWS
+                         [KWS ...]
 
-$ python generatedomain.py --allow-duplicates --number-words 2 --kws some awesome keywords
-somekeywords.com is available
-awesomekeywords.com is available
-keywordssome.com is available
-keywordsawesome.com is available
 
+$ python generatedomain.py --kws keyword1 keyword2 a,few,different,options
+keyword1keyword2a.com is available
+keyword1keyword2few.com is available
+keyword1keyword2different.com is available
+keyword1keyword2options.com is available
+
+
+$ python generatedomain.py --show-taken --kws demo,demonstration,example,exhibit tool,software,program
+demotool.com is NOT available; expiry date is 2020-09-22T18:32:37Z
+demosoftware.com is NOT available; expiry date is 2020-06-11T12:43:47Z
+demoprogram.com is NOT available; expiry date is 2020-01-16T20:10:59Z
+demonstrationtool.com is available
+demonstrationsoftware.com is NOT available; expiry date is 2020-08-02T18:16:09Z
+demonstrationprogram.com is available
+exampletool.com is available
+examplesoftware.com is NOT available; expiry date is 2025-10-16T19:45:49Z
+exampleprogram.com is NOT available; expiry date is 2021-02-15T07:21:18Z
+exhibittool.com is available
+exhibitsoftware.com is NOT available; expiry date is 2020-09-11T13:37:07Z
+exhibitprogram.com is NOT available; expiry date is 2020-06-02T15:34:20Z
 ```
 
-This tool creates all possible combinations from the provided keywords. As per the TODOs below, I will make this tool a bit more flexible shortly.
+This tool creates all possible combinations from the provided keywords. As per the TODO(s) below, I will make this tool a bit more flexible shortly.
 
 ## TODOs
 
- * Allow for keyword variations (probably by allowing something like `python generatedomain.py --kws tech,techno,techy kw2 kw3` - better than trying to be smart by adding "no", "ie", "y" onto the end of keywords and usually getting it wrong).
- * An option to skip the WHOIS check.
- * An option to also output taken domains (along with their expiry date).
+ * Add --starts-with and/or --ends-with type options (to prepend or append specified words/numbers to each generated domain).

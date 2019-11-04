@@ -7,7 +7,7 @@ import socket
 import sys
 
 
-def whois_request(domain, server, port=43):
+def whois_request(domain, server='whois.verisign-grs.com', port=43):
     """
     Carries out the WHOIS request for a particular domain name, against a particular registrar.
     This is not .com specific.
@@ -24,15 +24,28 @@ def whois_request(domain, server, port=43):
     return buff.decode("utf-8")
 
 
-def keyword_free(keyword):
-    """ 'Builds' the domain name (just appends .com as that's all I check right now) then checks its WHOIS status """
+def check_domain_candidate(keyword, args):
+    """
+    'Builds' the domain name (just appends .com as that's all I check right now)
+    then checks its WHOIS status - assuming we don't skip this in the args.
+    """
     domain_name = keyword + '.com'
-    whois_response = whois_request(domain_name, 'whois.verisign-grs.com')
 
-    if re.search("Domain Name: %s" % domain_name.upper(), whois_response):
-        return False
+    if not args.skip_whois:
+        whois_response = whois_request(domain_name)
+
+        if re.search("Domain Name: %s" % domain_name.upper(), whois_response):
+            # we have a match; the domain is already registered
+            if args.show_taken:
+                try:
+                    expiry_date = re.search("Registry Expiry Date\: (.*)", whois_response).group(1)
+                    print(domain_name + ' is NOT available; expiry date is ' + expiry_date)
+                except AttributeError:
+                    print(domain_name + ' is NOT available')
+        else:
+            print(domain_name + ' is available')
     else:
-        return True
+        print(domain_name + ' was generated (but not checked for availability)')
 
 
 def parse_cli_args():
@@ -40,13 +53,23 @@ def parse_cli_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--allow-duplicates", default=True, help="Allows for keywords to be re-used in the generated domain name",
+        "--skip-whois", default=False,
+        help="Only generate the possible domain name candidates (and output them)"
+             "- this does not do the actual WHOIS availability check.",
         action="store_true"
     )
 
-    parser.add_argument("--number-words", default=2, type=int, help="numbers of words in the domain candidates")
+    parser.add_argument(
+        "--show-taken", default=False,
+        help="Outputs all results, even generated domains which have already been registered.",
+        action="store_true"
+    )
 
-    parser.add_argument('--kws', nargs='+', help='<Required> Provide one or more keywords', required=True)
+    parser.add_argument('--kws', nargs='+',
+                        help='<Required> Provide one or more groups of keywords (each group can be a single keyword'
+                             'or comma separated, e.g. "--kws kw1,kw1alt,kw1b kw2,kw2alt"'
+                             'and "--kws kw1 kw2" are both valid inputs)',
+                        required=True)
 
     return parser.parse_args()
 
@@ -54,11 +77,11 @@ def parse_cli_args():
 if __name__ == "__main__":
     args = parse_cli_args()
 
-    combinations = list(itertools.product(args.kws, repeat=args.number_words))  # build all combinations
-    keywords = [value for value in combinations if
-                args.allow_duplicates or (value[0] != value[1] and not args.allow_duplicates)]  # optionally omit dups
+    kws = [kw.split(",") for kw in args.kws]
 
-    for kw_tuple in keywords:
+    # build all combinations from the provided keyword groups (i.e. the list of list of strings)
+    combinations = list(itertools.product(*kws))
+
+    for kw_tuple in combinations:
         kw = ''.join(str(i) for i in kw_tuple)
-        if keyword_free(kw):
-            print(kw + '.com is available')
+        check_domain_candidate(kw, args)

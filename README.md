@@ -12,8 +12,9 @@ Usage is command line:
 
 ```
 $ python generatedomain.py
-usage: generatedomain.py [-h] [--skip-whois] [--show-taken] --kws KWS
-                         [KWS ...]
+usage: generatedomain.py [-h] [--skip-whois] [--show-taken]
+                         [--starts-with STARTS_WITH] [--ends-with ENDS_WITH]
+                         --kws KWS [KWS ...]
 
 
 $ python generatedomain.py --kws keyword1 keyword2 a,few,different,options
@@ -36,10 +37,12 @@ exampleprogram.com is NOT available; expiry date is 2021-02-15T07:21:18Z
 exhibittool.com is available
 exhibitsoftware.com is NOT available; expiry date is 2020-09-11T13:37:07Z
 exhibitprogram.com is NOT available; expiry date is 2020-06-02T15:34:20Z
+
+python generatedomain.py --starts-with pre --ends-with post --kws keyword1 keyword2 a,few,different,options
+prekeyword1keyword2apost.com is available
+prekeyword1keyword2fewpost.com is available
+prekeyword1keyword2differentpost.com is available
+prekeyword1keyword2optionspost.com is available
 ```
 
-This tool creates all possible combinations from the provided keywords. As per the TODO(s) below, I will make this tool a bit more flexible shortly.
-
-## TODOs
-
- * Add --starts-with and/or --ends-with type options (to prepend or append specified words/numbers to each generated domain).
+This tool creates all possible combinations from the provided keywords.

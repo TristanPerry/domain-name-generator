@@ -4,7 +4,6 @@ import argparse
 import itertools
 import re
 import socket
-import sys
 
 
 def whois_request(domain, server='whois.verisign-grs.com', port=43):
@@ -14,14 +13,14 @@ def whois_request(domain, server='whois.verisign-grs.com', port=43):
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((server, port))
-    sock.send(("%s\r\n" % domain).encode("utf-8"))
+    sock.send(("%s\r\n" % domain).encode('utf-8'))
     buff = b""
     while True:
         data = sock.recv(1024)
         if len(data) == 0:
             break
         buff += data
-    return buff.decode("utf-8")
+    return buff.decode('utf-8')
 
 
 def check_domain_candidate(keyword, args):
@@ -53,23 +52,34 @@ def parse_cli_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--skip-whois", default=False,
-        help="Only generate the possible domain name candidates (and output them)"
-             "- this does not do the actual WHOIS availability check.",
-        action="store_true"
+        '--skip-whois', default=False,
+        help='Only generate the possible domain name candidates (and output them)'
+             '- this does not do the actual WHOIS availability check.',
+        action='store_true'
     )
 
     parser.add_argument(
-        "--show-taken", default=False,
-        help="Outputs all results, even generated domains which have already been registered.",
-        action="store_true"
+        '--show-taken', default=False,
+        help='Outputs all results, even generated domains which have already been registered.',
+        action='store_true'
     )
 
-    parser.add_argument('--kws', nargs='+',
-                        help='<Required> Provide one or more groups of keywords (each group can be a single keyword'
-                             'or comma separated, e.g. "--kws kw1,kw1alt,kw1b kw2,kw2alt"'
-                             'and "--kws kw1 kw2" are both valid inputs)',
-                        required=True)
+    parser.add_argument(
+        '--starts-with',
+        help='Add the submitted string to the start of every generated keyword.',
+        required=False)
+
+    parser.add_argument(
+        '--ends-with',
+        help='Add the submitted string to the end of every generated keyword.',
+        required=False)
+
+    parser.add_argument(
+        '--kws', nargs='+',
+        help='<Required> Provide one or more groups of keywords (each group can be a single keyword'
+             'or comma separated, e.g. "--kws kw1,kw1alt,kw1b kw2,kw2alt"'
+             'and "--kws kw1 kw2" are both valid inputs)',
+        required=True)
 
     return parser.parse_args()
 
@@ -84,4 +94,6 @@ if __name__ == "__main__":
 
     for kw_tuple in combinations:
         kw = ''.join(str(i) for i in kw_tuple)
+        kw = args.starts_with + kw if args.starts_with else kw
+        kw = kw + args.ends_with if args.ends_with else kw
         check_domain_candidate(kw, args)
